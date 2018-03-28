@@ -18,9 +18,24 @@
         $hrefArray = [];
 
         foreach ($anchors as $element) {
-            $href = $element->getAttribute('href');
+			// Remove anchors
+            $finalLink = explode("#", $element->getAttribute('href'));
+            $link = $finalLink[0];
 
-            $hrefArray[] = $href;
+			// Add the protocol
+			$adres = substr($link, 0, 7);
+			$adresS = substr($link, 0, 8);
+
+			$protocol = 'http://';
+			$protocolS = 'https://';
+
+			if($adres != $protocol && $adresS != $protocolS){
+				//echo '<br>Brak protokolu<br><br>';
+				$link = $url.$link;
+			}
+
+			// Push final link to array
+            $hrefArray[] = $link;
         }
         $hrefArray = array_unique($hrefArray);
 
