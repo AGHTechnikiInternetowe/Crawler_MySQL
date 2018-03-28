@@ -18,9 +18,17 @@
         $hrefArray = [];
 
         foreach ($anchors as $element) {
-            $href = $element->getAttribute('href');
-
-            $hrefArray[] = $href;
+            $href = explode("#",$element->getAttribute('href'));
+            $href_final = $href[0];
+            
+            $adres1 = "http://";
+			$adres2 = "https://";
+			$start1 = substr($href_final,0,7);
+			$start2 = substr($href_final,0,8);
+			
+			if ($adres1 != $start1 and $adres2 != $start2) {
+			$href_final = $url.$href_final;
+            $hrefArray[] = $href_final;
         }
         $hrefArray = array_unique($hrefArray);
 
