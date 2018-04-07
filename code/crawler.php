@@ -45,7 +45,10 @@
 
         return $result;
     }
-    $url = $_GET['url'];
+
+    if(!empty($_GET['url'])){
+        $url = $_GET['url'];
+    }
 
     if(isset($url)) {
         if (filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
@@ -70,7 +73,7 @@
   	<div class="search">
         <form action="" type="GET">
             <div class="search-container">
-                <input type="text" class="search-input" name="url" value="<?php echo $url; ?>">
+                <input type="text" class="search-input" name="url" value="<?php if(!empty($_GET['url'])){ echo $url; } ?>">
             </div>
             <div class="submit-container">
                 <input class="submit" type="submit" value="Crawl!">
