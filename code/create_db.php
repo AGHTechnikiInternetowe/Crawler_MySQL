@@ -1,5 +1,5 @@
 <?php
-$servername = "mysql";
+$servername = "localhost";
 $username = "root";
 $password = "mysql";
 
@@ -46,6 +46,28 @@ if (mysqli_query($conn, $sql)) {
     echo "Error creating table: " . mysqli_error($conn);
 }
 
+
+$result = mysqli_query($conn, "SHOW COLUMNS FROM `SitesViewed` LIKE 'content'");
+$exists = (mysqli_num_rows($result)) ? TRUE:FALSE;
+
+if (!$exists) {
+    // sql to ALTER table
+    $sql = "ALTER TABLE SitesViewed ADD content TEXT after site";
+
+    if (mysqli_query($conn, $sql)) {
+        echo "ALTER TABLE SitesViewed successfully";
+    } else {
+        echo "Error creating table: " . mysqli_error($conn);
+    }
+    
+    // sql to ALTER table
+    $sql = "ALTER TABLE SitesViewed MODIFY site VARCHAR(2048)";
+    if (mysqli_query($conn, $sql)) {
+        echo "ALTER TABLE SitesViewed successfully";
+    } else {
+        echo "Error creating table: " . mysqli_error($conn);
+    }
+}
 
 $conn->close();
 
