@@ -1,9 +1,22 @@
 <?php
-    $pageCrawlerResult = '';
-
+    $pageCrawlerResult = [];
+	$crawlDepth = 2;
+	//require 'create_db.php'; // display information about creating tables on the top of website, so I will copy settings from create_db.php (the information won't be display)
+	$servername = "localhost";
+	$username = "root";
+	$password = "";
+	// Create connection
+	$conn = new mysqli($servername, $username, $password);
+	// selecting database to adding query
+	$conn->select_db("Crawler");
+	// Check connection
+	if ($conn->connect_error) {
+		die("Connection failed: " . $conn->connect_error);
+	}
+	
     function crawl_page($url, $depth = 5)
     {
-        $result = '';
+		$result = [];
         static $seen = array();
         if (isset($seen[$url]) || $depth === 0) {
             return;
@@ -33,15 +46,12 @@
 				//echo '<br>Brak protokolu<br><br>';
 				$link = $url.$link;
 			}
-
 			// Push final link to array
-            $hrefArray[] = $link;
+            $result[] = $link;
+			//array_push($result,$link);
         }
-        $hrefArray = array_unique($hrefArray);
-
-        foreach ($hrefArray as $href) {
-            $result .= '<a href="' . $href . '">' . $href . '</a>';
-        }
+        $result = array_unique($result);
+		// print_r($result);
 
         return $result;
     }
@@ -54,9 +64,31 @@
         if (filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
             echo 'Not a valid html!!!';
         } else {
-            $pageCrawlerResult = crawl_page($url, 2);
+            $pageCrawlerResult = crawl_page($url, $crawlDepth);
+			
+			// save name of url address
+			$sql = "INSERT INTO SitesAwaiting (site) VALUES ('$url')";
+			//if (mysqli_query($conn, $sql)) {
+			if ($conn->query($sql) === TRUE) {
+				//echo "URL ADDRESS added successfully to database".'<br>';
+			} else {
+				echo "Error creating query " . mysqli_error($conn).'<br>';
+			}
+
+			// save links from url
+			foreach ($pageCrawlerResult as $link){
+				$sql = "INSERT INTO SitesViewed (site, content) VALUES ('$url', '$link')";
+				//if (mysqli_query($conn, $sql)) {
+				if ($conn->query($sql) === TRUE) {
+					//echo "Query insert successfully".'<br>';
+				} else {
+					echo "Error creating query " . mysqli_error($conn).'<br>';
+				}
+			}
         }
     }
+	// close connection to database 
+	$conn -> close();
 ?>
 
 <!DOCTYPE html>
@@ -82,7 +114,9 @@
   	</div>
     <div class="result">
         <?php
-            echo $pageCrawlerResult;
+			foreach ($pageCrawlerResult as $href) {
+				echo '<a href = "'.$href.'">'.$href.'</a>';
+			}
         ?>
     </div>
   </body>
