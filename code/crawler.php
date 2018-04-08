@@ -1,9 +1,24 @@
 <?php
-    $pageCrawlerResult = '';
 
-    function crawl_page($url, $depth = 5)
-    {
-        $result = '';
+include 'create_db.php';
+
+    // Global variables
+    $pageCrawlerResult = [];
+    $crawlerDepth = 2;
+    $dbName = 'crawler';
+
+    // Connect to database
+    $conn = new mysqli($servername, $username, $password, $dbname)
+
+    // Check connection to database
+    if ($conn->connect_error) {
+      die("Connection failed: " . $conn->connect_error);
+    }
+
+    echo "Connected successfully";
+
+    function crawl_page($url, $depth = 5) {
+        $result = [];
         static $seen = array();
         if (isset($seen[$url]) || $depth === 0) {
             return;
@@ -17,8 +32,9 @@
         $anchors = $dom->getElementsByTagName('a');
         $hrefArray = [];
 
+        // URLs from tag
         foreach ($anchors as $element) {
-			// Remove anchors
+			      // Remove anchors
             $finalLink = explode("#", $element->getAttribute('href'));
             $link = $finalLink[0];
 
@@ -29,24 +45,20 @@
 			$protocol = 'http://';
 			$protocolS = 'https://';
 
-			if($adres != $protocol && $adresS != $protocolS){
-				//echo '<br>Brak protokolu<br><br>';
+			if($adres != $protocol && $adresS != $protocolS) {
+				echo '<br>Brak protokolu<br><br>';
 				$link = $url.$link;
 			}
-
-			// Push final link to array
-            $hrefArray[] = $link;
+			      // Push final link to array
+            $result[] = $link;
         }
-        $hrefArray = array_unique($hrefArray);
 
-        foreach ($hrefArray as $href) {
-            $result .= '<a href="' . $href . '">' . $href . '</a>';
-        }
+        $result = array_unique($result);
 
         return $result;
     }
 
-    if(!empty($_GET['url'])){
+    if(!empty($_GET['url'])) {
         $url = $_GET['url'];
     }
 
@@ -54,9 +66,31 @@
         if (filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
             echo 'Not a valid html!!!';
         } else {
-            $pageCrawlerResult = crawl_page($url, 2);
-        }
-    }
+            $pageCrawlerResult = crawl_page($url, $crawlerDepth);
+            $pageContent = 'Page Content'
+
+            // Websites names
+            $sqlInsert = "INSERT INTO SitesAwaiting (site) VALUES ('$url')";
+            if (mysqli_query($conn, $sql)) {
+				          echo "Query added successfully".'<br>';
+			      } else {
+				          echo "Error creating query " . mysqli_error($conn).'<br>';
+			      }
+
+            // Websites links
+            foreach ($pageCrawlerResult as $link) {
+				          $sql = "INSERT INTO SitesViewed (site, content) VALUES ('$url', '$link')";
+				          if (mysqli_query($conn, $sql)) {
+					            //echo "Query added successfully".'<br>';
+                  } else {
+					               echo "Error creating query " . mysqli_error($conn).'<br>';
+				                 }
+			            }
+              }
+          }
+
+    // Close connection with database
+    $conn -> close();
 ?>
 
 <!DOCTYPE html>
@@ -82,7 +116,9 @@
   	</div>
     <div class="result">
         <?php
-            echo $pageCrawlerResult;
+          foreach ($pageCrawlerResult as $href) {
+              echo '<a href = "'.$href.'">'.$href.'</a>';
+          }
         ?>
     </div>
   </body>
