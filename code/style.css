@@ -29,7 +29,7 @@ body {
 }
 
 .submit,
-.result a {
+.result .crawler-single-result {
 	padding: 0 16px;
 	height: 36px;
 	color: #757575;
@@ -41,7 +41,7 @@ body {
 }
 
 .submit:hover,
-.result a:hover {
+.result .crawler-single-result:hover {
 	cursor: pointer;
 	border: 1px solid #c6c6c6;
 	box-shadow: 0 1px 1px rgba(0,0,0,0.1);
@@ -54,7 +54,7 @@ body {
 	padding: 10px;
 }
 
-.result a {
+.result .crawler-single-result {
 	font-weight: normal;
 	display: inline-block;
 	height: 30px;
