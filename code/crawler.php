@@ -63,7 +63,7 @@
 
         // FUNCTION BODY
 		$PageContent = file_get_contents($url);
-        return $PageContent;
+        return htmlspecialchars($PageContent);
     }
 
 // ---------------------------------------------- MAIN CODE ----------------------------------------------
